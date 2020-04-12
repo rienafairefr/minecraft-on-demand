@@ -1,6 +1,6 @@
 FROM itzg/minecraft-server
 
-RUN apk add --update supervisor py-pip py-twisted py-cffi libffi-dev py-cryptography && rm  -rf /tmp/* /var/cache/apk/*
+RUN apk add --no-cache --update supervisor py-pip py-twisted py-cffi libffi-dev py-cryptography
 
 COPY src/supervisord.conf /etc/
 
