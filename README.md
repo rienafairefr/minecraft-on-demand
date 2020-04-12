@@ -1,3 +1,5 @@
+![Docker Build Status](https://img.shields.io/docker/build/rienafairefr/minecraft-on-demand)
+
 A Docker image, based on tzg/minecraft-server, that will auto-start and auto-stop depending on 
 users trying to connect to it or connected to it.
 
