@@ -1,5 +1,7 @@
 FROM itzg/minecraft-server
 
+MAINTAINER rienafairefr
+
 RUN apk add --no-cache --update supervisor py-pip py-twisted py-cffi libffi-dev py-cryptography
 
 COPY src/supervisord.conf /etc/
