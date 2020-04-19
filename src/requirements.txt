@@ -2,3 +2,4 @@ supervisor
 mcstatus
 supervisor-stdout
 quarry
+jproperties

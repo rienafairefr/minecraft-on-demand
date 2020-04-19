@@ -14,6 +14,4 @@ RUN pip install -r requirements.txt
 
 COPY src/*.py ./
 
-ENV SERVER_PORT 25566
-
 ENTRYPOINT ["supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf"]

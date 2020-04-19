@@ -10,12 +10,14 @@ that could not handle all of them running at the same time, etc.
 There might be a better way to do it, but I did it that way:
 
 - Processes inside the docker container are managed by supervisor
-- There is a "wakeup" process that is binding to the port 25565 (default Minecraft Server port).
-- "wakeup" runs a simple Proxy Minecraft server (using a `quarry` Bridge) which listens for status
-request packet (sent when in the "Multiplayer" area of the Minecraft client, trying to select the server).
+- There is a "wakeup" process that is binding to the port $SERVER_PORT, usually 25565 (default Minecraft Server port).
+- "wakeup" runs a simple Proxy Minecraft server (using a `quarry` Bridge) which listens for players wanting
+to join the server.
 If the server is down, then the server process is started. 
 - When the server gets empty (monitored through `mcstatus` ), after some time then the server process is stopped
 
 Caveats: 
 
-- SERVER_PORT config env-var not yet supported
+- first startup could be long enough that the first player to join times out 
+- the server subprocess listens on hardcoded port 25566
+
