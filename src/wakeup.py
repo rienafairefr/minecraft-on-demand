@@ -62,7 +62,7 @@ class WakeupFactory(DownstreamFactory):
     protocol = WakeupProtocol
 
 
-def main(argv):
+def main():
     factory = WakeupFactory()
     factory.bridge_class = Bridge
     factory.connect_host = "127.0.0.1"
@@ -74,6 +74,6 @@ def main(argv):
 
 if __name__ == "__main__":
     import sys
-    main(sys.argv[1:])
+    main()
 
 
