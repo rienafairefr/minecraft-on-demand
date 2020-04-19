@@ -1,5 +1,4 @@
-[![](https://images.microbadger.com/badges/version/rienafairefr/minecraft-on-demand.svg)](https://microbadger.com/images/rienafairefr/minecraft-on-demand "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/rienafairefr/minecraft-on-demand.svg)](https://microbadger.com/images/rienafairefr/minecraft-on-demand "Get your own image badge on microbadger.com")
+Docker Hub: [![](https://images.microbadger.com/badges/version/rienafairefr/minecraft-on-demand.svg)](https://hub.docker.com/r/rienafairefr/minecraft-on-demand) [![](https://images.microbadger.com/badges/image/rienafairefr/minecraft-on-demand.svg)](https://hub.docker.com/r/rienafairefr/minecraft-on-demand)
 
 A Docker image, based on tzg/minecraft-server, that will auto-start and auto-stop depending on 
 users trying to connect to it or connected to it.
