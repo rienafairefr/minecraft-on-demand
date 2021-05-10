@@ -2,7 +2,7 @@ FROM itzg/minecraft-server
 
 MAINTAINER rienafairefr
 
-RUN apk add --no-cache --update supervisor py-pip py-twisted py-cffi libffi-dev py-cryptography
+RUN apk add --no-cache --update supervisor py3-pip py3-twisted py3-cffi libffi-dev py3-cryptography
 
 COPY src/supervisord.conf /etc/
 
@@ -12,7 +12,7 @@ WORKDIR /controller
 
 COPY src/requirements.txt .
 
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 COPY src/*.py ./
 

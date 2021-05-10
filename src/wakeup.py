@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Wakeup  server
 
@@ -6,10 +6,14 @@ This server accepts players, then starts the real server (server process for sup
 
 wakeup binds to $SERVER_PORT, and the subprocess binds to 25566
 """
+import sys
+import traceback
+
 import logging
 import os
 import time
-import xmlrpclib
+import xmlrpc.client as xmlrpclib
+
 
 from jproperties import Properties
 from mcstatus import MinecraftServer
@@ -35,7 +39,7 @@ def str2bool(v):
 
 class PersistentState:
     server = stopped
-    wakeup_port = int(os.environ['SERVER_PORT'])
+    wakeup_port = int(os.environ.get('SERVER_PORT', 25565))
     server_port = 25566
     motd = os.environ.get('MOTD', 'Unknown MOTD')
     online_mode = str2bool(os.environ['ONLINE_MODE'])
@@ -66,6 +70,12 @@ class WakeupProtocol(Downstream):
     def __init__(self, factory, remote_addr):
         load_properties()
         super(WakeupProtocol, self).__init__(factory, remote_addr)
+
+    def data_received(self, data):
+        try:
+            return super(WakeupProtocol, self).data_received(data)
+        except Exception:
+            pass
 
     def player_joined(self):
         print('player wants to join')
@@ -98,7 +108,7 @@ class WakeupProtocol(Downstream):
             pass
 
         if state.server != started:
-            self.factory.motd = 'on-demand (%s): %s:' % (state.server, state.motd)
+            self.factory.motd = 'on-demand (%s): %s: Join to start' % (state.server, state.motd)
         else:
             self.factory.motd = state.motd
 
@@ -117,11 +127,10 @@ def main():
     factory.connect_port = state.server_port
     factory.online_mode = state.online_mode
     factory.listen("0.0.0.0", state.wakeup_port)
-    # factory.log_level = logging.DEBUG
+    if str2bool(os.environ.get('DEBUG', 'false')):
+        factory.log_level = logging.DEBUG
     reactor.run()
 
 
 if __name__ == "__main__":
     main()
-
-

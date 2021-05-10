@@ -6,5 +6,7 @@ services:
       - 25565:25565
     environment:
       EULA: "TRUE"
-      VERSION: "1.9"
+      VERSION: "1.16.5"
       ONLINE_MODE: "FALSE"
+      MOTD: "LOCALHOST"
+      GRACE_PERIOD: "10 s"
