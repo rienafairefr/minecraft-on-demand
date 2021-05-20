@@ -59,7 +59,7 @@ def mc_no_player():
 
 def mc_just_started():
     if datetime.utcnow() - persistent.start_begin >= timedelta(seconds=10):
-        print('MC-OFF => MC-ON')
+        print('MC-JUST-STARTED => MC-ON')
         return mc_on
     return mc_just_started
 
@@ -76,6 +76,7 @@ def mc_on():
 
 def all_off():
     if get_state('wakeup') == ProcessStates.STOPPED:
+        print('starting wakeup...')
         server.supervisor.startProcess('wakeup')
         return all_off
     if get_state('wakeup') == ProcessStates.RUNNING:
@@ -87,6 +88,7 @@ def all_off():
 
 def mc_off():
     if get_state('server') == ProcessStates.RUNNING:
+        print('server is running')
         try:
             mcserver.status()  # query the server
             persistent.start_begin = datetime.utcnow()
