@@ -3,4 +3,4 @@ docker build -t minecraft-on-demand .
 
 docker run -d -e EULA=TRUE minecraft-on-demand
 
-python3
+python3 scripts/verify.py

@@ -19,3 +19,6 @@ jobs:
       - name: install dev deps
         run: pip3 install -r dev-requirements.txt
       - run: scripts/build-run.sh
+        env:
+          MOJANG_USERNAME: {{ secrets.MOJANG_USERNAME }}
+          MOJANG_PASSWORD: {{ secrets.MOJANG_PASSWORD}}
