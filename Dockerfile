@@ -1,12 +1,10 @@
-FROM itzg/minecraft-server
+FROM itzg/minecraft-server:2021.14.0
 
 MAINTAINER rienafairefr
 
-RUN apk update
-
-RUN apk add --no-cache --update supervisor py3-pip py3-twisted py3-cffi libffi-dev py3-cryptography
-
-RUN apk add nodejs-current npm
+RUN apt-get update \
+    && apt-get install -yqq supervisor python3-pip python3-twisted python3-cffi libffi-dev python3-cryptography \
+    && apt-get clean
 
 COPY src/supervisord.conf /etc/
 
