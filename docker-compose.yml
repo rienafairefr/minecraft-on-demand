@@ -1,6 +1,6 @@
 version: "2.4"
 services:
-  app:
+  online:
     build: .
     ports:
       - 25565:25565
@@ -10,4 +10,23 @@ services:
       ONLINE_MODE: "TRUE"
       MOTD: "LOCALHOST"
       GRACE_PERIOD: "10 s"
-      DEBUG: "TRUE"
+  offline:
+    build: .
+    ports:
+      - 25566:25565
+    environment:
+      EULA: "TRUE"
+      VERSION: "1.16.5"
+      ONLINE_MODE: "FALSE"
+      MOTD: "LOCALHOST"
+      GRACE_PERIOD: "10 s"
+  offline-1.9:
+    build: .
+    ports:
+      - 25567:25565
+    environment:
+      EULA: "TRUE"
+      VERSION: "1.9"
+      ONLINE_MODE: "FALSE"
+      MOTD: "LOCALHOST"
+      GRACE_PERIOD: "10 s"

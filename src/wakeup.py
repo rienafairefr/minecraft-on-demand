@@ -6,48 +6,51 @@ This server accepts players, then starts the real server (server process for sup
 
 wakeup binds to $SERVER_PORT, and the subprocess binds to 25566
 """
-import sys
-import traceback
-
+import argparse
 import logging
 import os
+import sys
 import time
 import xmlrpc.client as xmlrpclib
-
+from dataclasses import dataclass, asdict
+from pprint import pprint
 
 from jproperties import Properties
 from mcstatus import MinecraftServer
 from quarry.net.proxy import DownstreamFactory, Bridge, Downstream
 from supervisor.xmlrpc import SupervisorTransport
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 
 transport = SupervisorTransport(None, None, 'http://localhost:9001/RPC2')
 transport.verbose = True
 
-
 server = xmlrpclib.Server('http://unused', transport=transport)
-
 
 starting = 'starting'
 started = 'started'
 stopped = 'stopped'
+
+STOPPED = 0
+STARTING = 10
+RUNNING = 20
+BACKOFF = 30
+STOPPING = 40
+EXITED = 100
+FATAL = 200
+UNKNOWN = 1000
 
 
 def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
 
+@dataclass
 class PersistentState:
-    server = stopped
-    wakeup_port = int(os.environ.get('SERVER_PORT', 25565))
-    server_port = 25566
-    motd = os.environ.get('MOTD', 'Unknown MOTD')
-    online_mode = str2bool(os.environ['ONLINE_MODE'])
+    motd: str = os.environ.get('MOTD', 'Unknown MOTD')
 
 
 state = PersistentState()
-
-mcserver = MinecraftServer('localhost', state.server_port)
+pprint(asdict(state))
 
 
 def load_properties():
@@ -67,8 +70,9 @@ def load_properties():
 class WakeupProtocol(Downstream):
     log_level = logging.DEBUG
 
-    def __init__(self, factory, remote_addr):
+    def __init__(self, factory, remote_addr, mcserver):
         load_properties()
+        self.mcserver = mcserver
         super(WakeupProtocol, self).__init__(factory, remote_addr)
 
     def data_received(self, data):
@@ -79,58 +83,91 @@ class WakeupProtocol(Downstream):
 
     def player_joined(self):
         print('player wants to join')
-        if state.server == stopped:
-            # first packet
 
-            server.supervisor.startProcess('server')
-            state.server = starting
-            while True:
-                try:
-                    mcserver.status()
-                    state.server = started
-                    print('Server is started, continuing...')
-                    break
-                except IOError:
-                    print('Server is not yet started, please wait...')
-                time.sleep(1)
-        elif state.server == starting:
-            return
+        try:
+            self.mcserver.status()
+            print('Server is started, continuing...')
+        except:
+            server_state = server.supervisor.getProcessInfo('server')['state']
+            print('server_state')
+            print(server_state)
+            if server_state == STOPPED:
+                # first packet
+
+                server.supervisor.startProcess('server')
+                while True:
+                    try:
+                        self.mcserver.status()
+                        print('Server is started, continuing...')
+                        break
+                    except IOError:
+                        print('Server is not yet started, please wait...')
+                    time.sleep(1)
+            elif server_state == STARTING:
+                return
 
         super(WakeupProtocol, self).player_joined()
 
     def packet_status_request(self, buff):
         print('got a status request packet')
         try:
-            status = mcserver.status()
+            status = self.mcserver.status()
             # just in case the it can change
             state.motd = status.description['text']
         except IOError:
             pass
 
-        if state.server != started:
-            self.factory.motd = 'on-demand (%s): %s: Join to start' % (state.server, state.motd)
+        server_state = server.supervisor.getProcessInfo('server')['state']
+        if server_state != RUNNING:
+            self.factory.motd = f'on-demand (Stopped): {state.motd}: Join to start'
         else:
             self.factory.motd = state.motd
 
         super(WakeupProtocol, self).packet_status_request(buff)
 
 
-class WakeupFactory(DownstreamFactory):
+class WakeupDownstreamFactory(DownstreamFactory):
     protocol = WakeupProtocol
 
+    def __init__(self, mcserver):
+        super().__init__()
+        self.mcserver = mcserver
 
-def main():
-    print('main')
-    factory = WakeupFactory()
-    factory.bridge_class = Bridge
-    factory.connect_host = "127.0.0.1"
-    factory.connect_port = state.server_port
-    factory.online_mode = state.online_mode
-    factory.listen("0.0.0.0", state.wakeup_port)
+    def buildProtocol(self, addr):
+        return self.protocol(self, addr, self.mcserver)
+
+
+class WakeupBridge(Bridge):
+    def make_profile(self):
+        return self.downstream_factory.upstream_profile
+
+
+def main(argv):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--listen-host", default="", help="address to listen on")
+    parser.add_argument("--listen-port", default=25565, type=int, help="port to listen on")
+    parser.add_argument("--connect-host", help="address to connect to")
+    parser.add_argument("--connect-port", type=int, help="port to connect to")
+    parser.add_argument("--online-mode", action='store_true')
+    args = parser.parse_args(argv)
+
+    mcserver = MinecraftServer(args.connect_host, args.connect_port)
+
+    factory = WakeupDownstreamFactory(mcserver)
+    # factory.bridge_class = WakeupBridge
+    factory.connect_host = args.connect_host
+    factory.connect_port = args.connect_port
+    online_mode: bool = str2bool(os.environ.get('ONLINE_MODE', 'TRUE'))
+    if args.online_mode:
+        online_mode = True
+
+    print('online mode' if online_mode else 'offline mode')
+    factory.online_mode = online_mode
+    factory.listen(args.listen_host, args.listen_port)
     if str2bool(os.environ.get('DEBUG', 'false')):
         factory.log_level = logging.DEBUG
-    reactor.run()
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
+    reactor.run()

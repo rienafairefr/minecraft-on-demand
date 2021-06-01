@@ -17,12 +17,7 @@ WORKDIR /controller
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
-COPY package.json .
-RUN npm i
-
 COPY src/*.py ./
 RUN chmod +x *.py
-COPY src/*.js ./
-RUN chmod +x *.js
 
 ENTRYPOINT ["supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf"]
