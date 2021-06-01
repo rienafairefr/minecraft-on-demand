@@ -1,4 +1,4 @@
-FROM itzg/minecraft-server
+FROM itzg/minecraft-server:2021.2.0
 
 MAINTAINER rienafairefr
 

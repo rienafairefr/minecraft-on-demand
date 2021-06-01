@@ -10,6 +10,28 @@ services:
       ONLINE_MODE: "TRUE"
       MOTD: "LOCALHOST"
       GRACE_PERIOD: "10 s"
+  spigot:
+    build: .
+    ports:
+      - 25567:25565
+    environment:
+      EULA: "TRUE"
+      VERSION: "1.16.5"
+      ONLINE_MODE: "FALSE"
+      MOTD: "LOCALHOST SPIGOT"
+      GRACE_PERIOD: "10 s"
+      TYPE: SPIGOT
+  bukkit:
+    build: .
+    ports:
+      - 25567:25565
+    environment:
+      EULA: "TRUE"
+      VERSION: "1.16.5"
+      ONLINE_MODE: "FALSE"
+      MOTD: "LOCALHOST BUKKIT"
+      GRACE_PERIOD: "10 s"
+      TYPE: BUKKIT
   offline:
     build: .
     ports:
