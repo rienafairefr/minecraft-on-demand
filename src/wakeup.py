@@ -137,11 +137,6 @@ class WakeupDownstreamFactory(DownstreamFactory):
         return self.protocol(self, addr, self.mcserver)
 
 
-class WakeupBridge(Bridge):
-    def make_profile(self):
-        return self.downstream_factory.upstream_profile
-
-
 def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("--listen-host", default="", help="address to listen on")
@@ -154,7 +149,6 @@ def main(argv):
     mcserver = MinecraftServer(args.connect_host, args.connect_port)
 
     factory = WakeupDownstreamFactory(mcserver)
-    # factory.bridge_class = WakeupBridge
     factory.connect_host = args.connect_host
     factory.connect_port = args.connect_port
     online_mode: bool = str2bool(os.environ.get('ONLINE_MODE', 'TRUE'))

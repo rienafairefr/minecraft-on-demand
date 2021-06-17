@@ -38,7 +38,6 @@ def get_state(process):
 
 
 def mc_no_player():
-    print('no players, waiting...')
     status = mcserver.status()
     if status.players.online > 0:
         persistent.wait_begin = datetime.utcnow()
@@ -88,7 +87,6 @@ def all_off():
 
 def mc_off():
     if get_state('server') == ProcessStates.RUNNING:
-        print('server is running')
         try:
             mcserver.status()  # query the server
             persistent.start_begin = datetime.utcnow()

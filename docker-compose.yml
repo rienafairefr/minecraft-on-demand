@@ -8,17 +8,17 @@ services:
       EULA: "TRUE"
       VERSION: "1.16.5"
       ONLINE_MODE: "TRUE"
-      MOTD: "LOCALHOST"
+      MOTD: "LOCALHOST-ONLINE"
       GRACE_PERIOD: "10 s"
   spigot:
     build: .
     ports:
-      - 25567:25565
+      - 25566:25565
     environment:
       EULA: "TRUE"
       VERSION: "1.16.5"
       ONLINE_MODE: "FALSE"
-      MOTD: "LOCALHOST SPIGOT"
+      MOTD: "LOCALHOST-SPIGOT"
       GRACE_PERIOD: "10 s"
       TYPE: SPIGOT
   bukkit:
@@ -29,26 +29,16 @@ services:
       EULA: "TRUE"
       VERSION: "1.16.5"
       ONLINE_MODE: "FALSE"
-      MOTD: "LOCALHOST BUKKIT"
+      MOTD: "LOCALHOST-BUKKIT"
       GRACE_PERIOD: "10 s"
       TYPE: BUKKIT
   offline:
     build: .
     ports:
-      - 25566:25565
+      - 25568:25565
     environment:
       EULA: "TRUE"
       VERSION: "1.16.5"
       ONLINE_MODE: "FALSE"
-      MOTD: "LOCALHOST"
-      GRACE_PERIOD: "10 s"
-  offline-1.9:
-    build: .
-    ports:
-      - 25567:25565
-    environment:
-      EULA: "TRUE"
-      VERSION: "1.9"
-      ONLINE_MODE: "FALSE"
-      MOTD: "LOCALHOST"
+      MOTD: "LOCALHOST-OFFLINE"
       GRACE_PERIOD: "10 s"
