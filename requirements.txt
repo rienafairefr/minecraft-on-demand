@@ -1,5 +1,5 @@
 supervisor
 mcstatus
-quarry
+git+git://github.com/JLyne/quarry.git@d5afd1eb#egg=quarry
 jproperties
 parsedatetime

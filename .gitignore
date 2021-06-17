@@ -1,6 +1,3 @@
-node_modules/
 supervisord.log
-
 .env
-
 .secrets
