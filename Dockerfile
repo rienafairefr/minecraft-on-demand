@@ -1,4 +1,4 @@
-FROM itzg/minecraft-server:java16
+FROM itzg/minecraft-server
 
 MAINTAINER rienafairefr
 
